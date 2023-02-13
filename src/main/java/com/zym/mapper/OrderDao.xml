@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zym.mapper.OrderDao">
+    <sql id="concatSql">
+       <where>
+        <if test="oId!=null and oId!=''">
+            and oid=#{oId}
+        </if>
+        <if test="status!=null and status!=''">
+            and status=#{status}
+        </if>
+       </where>
+    </sql>
+    
+    <select id="totalCount" resultType="int">
+        select count(1) from xmorder
+        <include refid="concatSql"></include>
+    </select>
+
+    <select id="showAllOrder" resultType="com.zym.pojo.Order" resultMap="selectUsers">
+        select * from xmorder,users,address
+        <where>
+            <if test="oId!=null and oId!=''">
+                and oid=#{oId}
+            </if>
+            <if test="status!=null and status!=''">
+                and status=#{status}
+            </if>
+        and users.uid=xmorder.uid and xmorder.addressId=address.addressId
+        limit #{start},#{size}
+        </where>
+    </select>
+
+    <resultMap id="selectUsers" type="Order">
+        <id property="oId" column="oid"></id>
+        <result property="uId" column="uid"></result>
+        <result property="addressId" column="addressId"></result>
+        <result property="totalPrice" column="totalprice"></result>
+        <result property="remarks" column="remarks"></result>
+        <result property="status" column="status"></result>
+        <result property="oDate" column="odate"></result>
+        <association property="users" javaType="Users">
+            <id property="uId" column="uid"></id>
+            <result property="uName" column="uname"></result>
+ <!--           <result property="uPass" column="upass"></result>
+            <result property="uStatus" column="ustatus"></result>
+            <result property="uLevel" column="ulevel"></result>
+            <result property="score" column="score"></result>-->
+        </association>
+        <association property="address" javaType="Address">
+            <id property="addressId" column="addressId"></id>
+            <result property="uId" column="uid"></result>
+            <result property="cnee" column="cnee"></result>
+            <result property="phone" column="phone"></result>
+            <result property="address" column="address"></result>
+        </association>
+    </resultMap>
+
+    <select id="showOrderDetail" resultMap="selectProduct" parameterType="String" resultType="com.zym.pojo.OrderDetail">
+        select oid,pnumber,ptotal,p_name,p_price,p_image from orderdetail,product_info
+        where pid=p_id and oid=#{oId}
+    </select>
+    <resultMap id="selectProduct" type="OrderDetail">
+        <id property="odId" column="odid"></id>
+        <result property="oId" column="oid"></result>
+        <result property="pId" column="pid"></result>
+        <result property="pNumber" column="pnumber"></result>
+        <result property="pTotal" column="ptotal"></result>
+        <collection property="productList" ofType="Product">
+            <id property="p_Id" column="p_id"></id>
+            <result property="p_Name" column="p_name"></result>
+            <result property="p_Content" column="p_content"></result>
+            <result property="p_price" column="p_price"></result>
+            <result property="p_Image" column="p_image"></result>
+            <result property="p_Number" column="p_number"></result>
+            <result property="type_Id" column="type_id"></result>
+            <result property="p_Date" column="p_date"></result>
+        </collection>
+    </resultMap>
+</mapper>

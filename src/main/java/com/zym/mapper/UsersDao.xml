@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zym.mapper.UsersDao">
+
+    <select id="totalCount" resultType="int">
+        select count(1) from users
+        <where>
+            <if test="uName!=null and uName!=''">
+                and uName like concat('%',#{uName},'%')
+            </if>
+            <if test="uStatus!=null and uStatus!=''">
+                and uStatus=#{uStatus}
+            </if>
+        </where>
+    </select>
+
+    <select id="showAllOrder" resultType="com.zym.pojo.Users">
+        select * from users
+        <where>
+            <if test="uName!=null and uName!=''">
+                and uName like concat('%',#{uName},'%')
+            </if>
+            <if test="uStatus!=null and uStatus!=''">
+                and uStatus=#{uStatus}
+            </if>
+        </where>
+        <if test="orderbyId==0 and orderbyId!=null and orderbyId!=''">
+            order by ulevel
+        </if>
+        <if test="orderbyId==1 and orderbyId!=null and orderbyId!=''">
+            order by ulevel desc
+        </if>
+        limit #{start},#{size}
+    </select>
+
+    <select id="getUsersByuId" resultType="users" parameterType="Integer">
+        select * from users where uid=#{uId}
+    </select>
+
+    <update id="updateUsers" parameterType="users">
+        update users set uname=#{uName},ustatus=#{uStatus},ulevel=#{uLevel},score=#{score} where uid=#{uId}
+    </update>
+
+    <delete id="deleteUsers" parameterType="Integer">
+        delete from users where uid=#{uId}
+    </delete>
+</mapper>

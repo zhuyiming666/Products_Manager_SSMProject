@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zym.mapper.ProductDao">
+
+    <select id="totalCount" resultType="int">
+        select count(*) from product_info
+        <where>
+            <if test="msgName!=null and msgName!=''">
+                and p_name like concat('%',#{msgName},'%')
+            </if>
+            <if test="type_Id!=null and type_Id!='' and type_Id!=0">
+                and type_id=#{type_Id}
+            </if>
+        </where>
+    </select>
+
+    <select id="getProducts" resultType="Product">
+        select * from product_info
+        <where>
+            <if test="msgName!=null and msgName!=''">
+                and p_name like concat('%',#{msgName},'%')
+            </if>
+            <if test="type_Id!=null and type_Id!=''">
+                and type_id=#{type_Id}
+            </if>
+        </where>
+        limit #{begin},#{pageSize}
+    </select>
+
+    <select id="getProductType" resultType="com.zym.pojo.ProductType">
+        select *
+        from product_type
+    </select>
+
+    <insert id="insertProdct" parameterType="com.zym.pojo.Product">
+        insert into product_info(p_name, p_content, p_price, p_image, p_number, type_id, p_date)
+        values (#{p_Name}, #{p_Content}, #{p_price}, #{p_Image}, #{p_Number}, #{type_Id}, #{p_Date})
+    </insert>
+
+    <delete id="deleteProduct" parameterType="Integer">
+        delete
+        from product_info
+        where p_id = #{pid}
+    </delete>
+
+    <delete id="deleteByIds" parameterType="String">
+       delete from product_info where p_id in
+       <foreach collection="ids.split(',')" item="ids" index="index" open="(" separator="," close=")">#{ids}</foreach>
+    </delete>
+
+    <select id="selectById" parameterType="Integer" resultType="com.zym.pojo.Product">
+        select *
+        from product_info
+        where p_id = #{pid}
+    </select>
+
+    <select id="updateProduct" parameterType="com.zym.pojo.Product">
+        update product_info
+        set p_name=#{p_Name},
+            p_content=#{p_Content},
+            p_price=#{p_price},
+            p_image=#{p_Image},
+            p_number=#{p_Number},
+            type_id=#{type_Id},
+            p_date=#{p_Date}
+        where p_id =#{p_Id};
+    </select>
+</mapper>
